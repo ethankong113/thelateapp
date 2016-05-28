@@ -1,0 +1,90 @@
+html, body, header, head {
+  padding: 0;
+  margin: 0;
+}
+
+header {
+  background-color: skyblue;
+  color: white;
+  }
+
+.empty-row {
+  height: 30px;
+}
+
+.login-box {
+  height: 400px;
+  border-width: thick;
+  border-color: skyblue;
+  border-style: solid;
+  border-radius: 5px;
+}
+
+.login-box-header {
+  background-color: skyblue;
+  color: white;
+  font-size: 30px;
+}
+
+.login-box-header-button {
+  width: 47%;
+  text-align: center;
+  display: inline-block;
+}
+
+#login-button-login {
+  background-color: skyblue;
+}
+
+#login-button-signup {
+  background-color: lightgrey;
+}
+
+.login-box-header-button:hover {
+
+}
+
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}
+
+.login-box-header-divider {
+  width: 2%;
+  background-color: white;
+  display: inline-block;
+}
+
+#loginform .ng-invalid {
+}
+
+.error-msg {
+  color: red;
+}
+
+/*main page style starts here*/
+
+header .navbar-default, footer .navbar-default {
+    background-color: skyblue;
+    border-color: skyblue;
+}
+
+footer .navbar-default a {
+  color: white;
+}
+
+footer .navbar-default a:hover div {
+  color: skyblue;
+  background-color: white;
+}
+
+.empty-row-lg {
+  height: 70px;
+}
+
+.empty-row-sm {
+  height: 20px;
+}

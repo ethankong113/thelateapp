@@ -1,0 +1,13 @@
+<div class="empty-row"></div>
+<div ng-repeat="val in events">
+<a href="#eventlist/:{{val._id}}">
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{val.title}}</h3>
+  </div>
+  <div class="panel-body">
+    <span class="float-left">{{val.location}}</span><span class="float-right"><span class="glyphicon glyphicon-time"></span>&nbsp;{{val.time}}</span>
+  </div>
+</div>
+</a>
+</div>

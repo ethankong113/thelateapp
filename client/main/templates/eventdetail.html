@@ -1,0 +1,18 @@
+<h1>{{detail.title}}</h1>
+<h4><span class="glyphicon glyphicon-map-marker"></span>&nbsp;{{detail.location}}</h4>
+<h4><span class="glyphicon glyphicon-time"></span>&nbsp;<span>{{detail.date}}</span>&nbsp;<span>{{detail.time}}</span>&nbsp;<span>with a grace period of</span>&nbsp;<span>{{detail.graceperiod}}</span>&nbsp;<span>minutes</span></h4>
+<div class="empty-row"></div>
+<div class="dropdown">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    Arrival Status
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a ng-click="checkIn($event)" id="Coming">&nbsp;&nbsp;Coming</a></li>
+    <li><a ng-click="checkIn($event)" id="CheckedIn">&nbsp;&nbsp;Checked In</a></li>
+  </ul>
+</div>
+<div class="empty-row"></div>
+<ul class="list-group">
+  <li href="#" class="list-group-item list-group-item-default" ng-repeat="guest in detail.guests">{{guest.name}}<span class="float-right">{{guest.status}}</span></li>
+</ul>

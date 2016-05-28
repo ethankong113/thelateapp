@@ -1,0 +1,15 @@
+{
+  "name": "finalproject",
+  "description": "",
+  "main": "app.js",
+  "license": "ISC",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
