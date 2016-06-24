@@ -11,6 +11,10 @@
   "dependencies": {
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
+    "gulp": "^3.9.1",
     "mongoose": "^4.4.19"
+  },
+  "devDependencies": {
+    "gulp-livereload": "^3.8.1"
   }
 }

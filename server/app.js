@@ -144,14 +144,14 @@ app.get('/eventdetail/:id', function(req,res){
   'host title date time graceperiod location guests', function(err, data){
     if (err) {
       console.log(err)
-      res.send(err)
+      res.send(err);
     } else {
       console.log("Data retrieved successfully.")
-      res.json(data)
+      res.json(data);
     }
   })
 })
 
 app.listen(port, function(){
-  console.log("Server is running on " + port)
+  console.log("Server is running on " + port);
 });
