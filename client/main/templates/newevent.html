@@ -36,7 +36,7 @@
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-        <li ng-repeat="val in friends" ng-click="clickEvent($event)" id="{{val.username}}">&nbsp;&nbsp;{{val.username}}</li>
+        <li ng-repeat="friend in friends" ng-click="clickEvent($event)" data-friend-id="{{friend}}">&nbsp;&nbsp;{{friend}}</li>
       </ul>
     </div>
       <li class="list-group-item"><span>Guest List: </span><span ng-repeat="guest in guestlist"><span class="label label-info">{{guest.guest}}</span>&nbsp;</span></li>

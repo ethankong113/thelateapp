@@ -18,11 +18,13 @@ angular.module('mainApp')
         url: '/getfriends',
         method: 'GET'
       }).then(function(results){
+        console.log(results)
         friendList = []
         for (var i = 0; i < results.data.length; i++) {
           friendList.push(results.data[i])
         }
       }).then(function(){
+        console.log(friendList)
         $scope.friends = friendList
       })
     };
@@ -30,12 +32,12 @@ angular.module('mainApp')
     var guestlist = []
     $scope.clickEvent = function ($event) {
       for (var i=0; i < guestlist.length; i++){
-        if (guestlist[i].guest == $event.currentTarget.id) {
+        if (guestlist[i].guest == $event.currentTarget.getAttribute("data-friend-id")) {
           guestlist.splice(i,1)
         }
       }
       var newGuest = {
-        guest:$event.currentTarget.id,
+        guest:$event.currentTarget.getAttribute("data-friend-id"),
         status: 'Coming'
       }
       guestlist.push(newGuest)
@@ -45,7 +47,7 @@ angular.module('mainApp')
     var statuslist = []
       $scope.submitForm = function(form) {
         console.log(guestlist)
-        $http.post('/main/createevent', {
+        $http.post('/createevent', {
             title: form.title.$viewValue,
             date: form.date.$viewValue,
             time: form.time.$viewValue,

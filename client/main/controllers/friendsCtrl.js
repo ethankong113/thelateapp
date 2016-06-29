@@ -2,7 +2,17 @@
 
 angular.module('mainApp')
   .controller('friendsController', ['$scope', '$http', function($scope, $http){
-    $scope.searchFriends = function(form) {
+    $scope.searchFriends = function(form){
+      searchFriends(form)
+    }
+
+    $scope.someFunction = function(event, form) {
+      if(event.keyCode === 13) {
+        searchFriends(form)
+      }
+    }
+
+    function searchFriends(form) {
       var query = form.keyword.$viewValue
       var friendList = []
       $http({
@@ -15,7 +25,17 @@ angular.module('mainApp')
           friendList.push(results.data[i])
         }
       }).then(function(){
+        console.log(friendList)
         $scope.friends = friendList
+      })
+    }
+
+    $scope.addFriend = function($event) {
+      var friendId = $event.currentTarget.getAttribute("data-friend-id")
+      $http.post('/addfriend', {
+        friendId: friendId
+      }).then(function(results) {
+        console.log(results)
       })
     }
 
