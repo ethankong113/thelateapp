@@ -1,13 +1,13 @@
 <div class="empty-row-sm"></div>
 <form method="get" name="searchform">
   <div class="input-group">
-    <input type="text" class="form-control" placeholder="Search friends..." aria-describedby="basic-addon1" name="keyword" ng-model="keyword">
+    <input type="text" class="form-control" placeholder="Search friends..." aria-describedby="basic-addon1" name="keyword" ng-model="keyword" ng-keypress="someFunction($event, searchform)">
     <span class="input-group-addon" id="basic-addon1" ng-click="searchFriends(searchform)"><span class="glyphicon glyphicon-search"></span></span>
   </div>
 </form>
 <div class="empty-row-sm"></div>
 <ul class="list-group">
-  <li class="list-group-item" ng-repeat="val in friends">
+  <li class="list-group-item" ng-repeat="val in friends" ng-click="addFriend($event)" data-friend-id="{{val._id}}">
     {{val.username}}
     <span class="float-right"><span class="glyphicon glyphicon-plus"></span></span>
   </li>

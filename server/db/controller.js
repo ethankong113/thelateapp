@@ -17,7 +17,13 @@ var EventSchema = mongoose.Schema({
   guests: [{name: String, status: String}]
 })
 
+var FriendshipSchema = mongoose.Schema({
+  userId: String,
+  friends: [String]
+})
+
 module.exports = {
-  users: mongoose.model('Userinfo', UserSchema),
-  events: mongoose.model('EventInfo', EventSchema)
+  users: mongoose.model('UserInfo', UserSchema),
+  events: mongoose.model('EventInfo', EventSchema),
+  friendships: mongoose.model('FriendshipInfo', FriendshipSchema)
 }

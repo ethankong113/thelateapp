@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var path = require('path');
 var User = require('./db/controller').users
 var Event = require('./db/controller').events
+var Friendship = require('./db/controller').friendships
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -59,7 +60,7 @@ app.get('/main', function(req, res){
   res.sendFile(path.join(__dirname, "../client/main/index.html"))
 })
 
-app.post('/main/createevent', function(req,res){
+app.post('/createevent', function(req,res){
   var newEvent = new Event()
   newEvent.host = currentUser.userId
   newEvent.title = req.body.title
@@ -67,8 +68,13 @@ app.post('/main/createevent', function(req,res){
   newEvent.time = req.body.time
   newEvent.graceperiod = req.body.graceperiod
   newEvent.location = req.body.location
-  for (var i = 0; i < req.body.guests.length; i++){
-    newEvent.guests[i] = {name: req.body.guests[i].guest, status: req.body.guests[i].status}
+  for (var i = 0; i <= req.body.guests.length; i++){
+    //We are using less than or equal to because we need an extra slot to add in the host himself.
+    if (req.body.guests[i] == req.body.guests[req.body.guests.length]) {
+      newEvent.guests[i] = {name: currentUser.username, status: 'Coming'}
+    } else {
+      newEvent.guests[i] = {name: req.body.guests[i].guest, status: req.body.guests[i].status}
+    }
   }
   newEvent.save(function(err, results) {
     if (err) {
@@ -128,12 +134,66 @@ app.get('/searchfriends', function(req,res) {
 
 app.get('/getfriends', function(req,res) {
   console.log("We have received a request from frontend")
-  User.find('username', function(err,data){
+  Friendship.findOne({'userId': currentUser.userId}, 'friends', function(err, data){
     if (err) {
       console.log(err)
     } else {
       console.log(data)
-      res.json(data)
+      var friendList = []
+      for (var i = 0; i < data.friends.length; i++) {
+        if (data.friends[i] != data.friends[data.friends.length - 1]) {
+          User.findOne({'_id': data.friends[i]}, 'username', function(err, results) {
+            friendList.push(results.username)
+          })
+        } else {
+          User.findOne({'_id': data.friends[i]}, 'username', function(err, results) {
+            friendList.push(results.username)
+            res.json(friendList)
+          })
+        }
+      }
+    }
+  })
+})
+
+app.post('/addfriend', function(req,res) {
+  Friendship.findOne({'userId': currentUser.userId}, 'friends', function(err, data){
+    if (err) {
+      console.log(err)
+    } else {
+      if (data) {
+        console.log("This is returing the list of friends before we loop it through: " + data)
+        for (var i=0; i<data.friends.length; i++) {
+          if (data.friends[i] == req.body.friendId) {
+            console.log("We found your friendship")
+            res.json(data.friends[i])
+          } else if (data.friends[i] == data.friends[data.friends.length]) {
+            console.log("We didn't find a match")
+            console.log("And so we are creating an entry.")
+            Friendship.findOne({'userId': currentUser.userId},
+            'friends', function(err, update) {
+              if (err) {
+                console.log(err)
+              } else {
+                console.log(update)
+                res.json(update)
+              }
+            })
+          }
+        }
+      } else {
+        var newFriendship = new Friendship()
+        newFriendship.userId = currentUser.userId
+        newFriendship.friends[0] = req.body.friendId
+        newFriendship.save(function(err, data) {
+          if (err) {
+            console.log(err)
+          } else {
+            console.log("We made a new friend")
+            console.log(data)
+          }
+        })
+      }
     }
   })
 })
