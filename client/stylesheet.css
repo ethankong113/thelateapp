@@ -88,3 +88,26 @@ footer .navbar-default a:hover div {
 .empty-row-sm {
   height: 20px;
 }
+
+.section-banner {
+  background-color: beige;
+  color: skyblue;
+  border: 2px black solid;
+  border-radius: 5px;
+}
+
+.friend-isfriend {
+  border: 2px solid black;
+  border-radius: 5px;
+  padding: 4px;
+  background-color: skyblue;
+  color: white;
+}
+
+.friend-addfriend {
+  border: 2px solid black;
+  border-radius: 5px;
+  padding: 4px;
+  background-color: lightgreen;
+  color: white;
+}

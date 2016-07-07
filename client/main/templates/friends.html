@@ -2,13 +2,17 @@
 <form method="get" name="searchform">
   <div class="input-group">
     <input type="text" class="form-control" placeholder="Search friends..." aria-describedby="basic-addon1" name="keyword" ng-model="keyword" ng-keypress="someFunction($event, searchform)">
-    <span class="input-group-addon" id="basic-addon1" ng-click="searchFriends(searchform)"><span class="glyphicon glyphicon-search"></span></span>
+    <span class="input-group-addon" id="basic-addon1" ng-click="searchUsers(searchform)"><span class="glyphicon glyphicon-search"></span></span>
   </div>
 </form>
 <div class="empty-row-sm"></div>
+<h2>{{message}}</h2>
 <ul class="list-group">
-  <li class="list-group-item" ng-repeat="val in friends" ng-click="addFriend($event)" data-friend-id="{{val._id}}">
-    {{val.username}}
-    <span class="float-right"><span class="glyphicon glyphicon-plus"></span></span>
+  <li class="list-group-item" ng-repeat="user in users" ng-click="addFriend($event)" data-friend="{{user.username}}" data-friendship="{{user.friendship}}">
+    <span>{{user.username}}</span>
+    <span class="float-right">
+      <span ng-if="user.friendship==true"><span class="friend-isfriend">Already Friend</span></span>
+      <span ng-if="user.friendship==false"><span class="friend-addfriend">Add Friend</span></span>
+    </span>
   </li>
 </ul>

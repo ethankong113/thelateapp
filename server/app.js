@@ -3,6 +3,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var path = require('path');
+var Q = require('q');
 var User = require('./db/controller').users
 var Event = require('./db/controller').events
 var Friendship = require('./db/controller').friendships
@@ -15,30 +16,46 @@ app.use(express.static(path.join(__dirname, "../client")));
 var port = process.env.PORT || 8080;
 var currentUser = {
   username: "heyworld",
-  userId: "57450fab78822a2c23e13f79"
+  userId: 0
 }
 
 app.get('/', function(req,res){
   res.sendFile(path.join(__dirname, "../client/login/login.html"))
 })
 
+function idToName(id) {
+  User.findOne({'_id': id}, 'username',
+   function(err, data) {
+    if (err) {
+      console.log(err)
+      } else {
+        return data.username
+      }
+    });
+}
+
 app.post('/login', function(req,res) {
   User.findOne({'username': req.body.username},
-      '_id password', function(err, loginUser) {
+      '_id password', function(err, login) {
         if (err) {
-          console.log(err)
+          console.log(err);
         } else {
-          if (loginUser.password != req.body.password) {
-            console.log('Password is invalid.')
-            res.redirect('/')
+          if (login === null) {
+            res.redirect('/?message="Username does not exist."')
           } else {
-            currentUser.username = req.body.username
-            currentUser.userId = loginUser._id
-            res.redirect('/main')
+            if (login.password != req.body.password) {
+              console.log('Password is invalid.');
+              res.redirect('/?message="Password does not match record."');
+            } else {
+              console.log(login._id)
+              currentUser.username = req.body.username
+              currentUser.userId = login._id
+              res.redirect('/main');
+            }
           }
         }
-      })
-})
+      });
+});
 
 app.post('/signup', function(req,res){
   var newUser = new User()
@@ -51,7 +68,16 @@ app.post('/signup', function(req,res){
       res.redirect('/')
     } else {
       console.log("Saved: " + results)
-      res.redirect('/')
+      var newFriendship = new Friendship()
+      newFriendship.userId = results._id
+      newFriendship.save(function(err, data) {
+        if (err) {
+          console.log(err)
+        } else {
+          console.log("Initialized user.")
+          res.redirect('/?message="You have successfully registered!"')
+        }
+      })
     }
   })
 })
@@ -107,7 +133,6 @@ app.post('/checkin', function(req,res){
 })
 
 app.get('/geteventlist', function(req,res) {
-  console.log("We have received a request from frontend")
   Event.find({'host': currentUser.userId},
   'title data time location _id', function(err, data){
     if (err) {
@@ -119,80 +144,148 @@ app.get('/geteventlist', function(req,res) {
   })
 })
 
-app.get('/searchfriends', function(req,res) {
-  console.log("We have received a requst from frontend")
+app.get('/searchusers', function(req,res) {
   User.find({'username': {'$regex': req.query.keyword}},
-  'username', function(err, data) {
+  'username', function(err, users) {
       if(err) {
         console.log(err)
       } else {
-        console.log(data)
-        res.json(data)
-      }
-  })
-})
-
-app.get('/getfriends', function(req,res) {
-  console.log("We have received a request from frontend")
-  Friendship.findOne({'userId': currentUser.userId}, 'friends', function(err, data){
-    if (err) {
-      console.log(err)
-    } else {
-      console.log(data)
-      var friendList = []
-      for (var i = 0; i < data.friends.length; i++) {
-        if (data.friends[i] != data.friends[data.friends.length - 1]) {
-          User.findOne({'_id': data.friends[i]}, 'username', function(err, results) {
-            friendList.push(results.username)
-          })
+        var userList = []
+        if (users===null || users.length===0) {
+          res.json(userList)
         } else {
-          User.findOne({'_id': data.friends[i]}, 'username', function(err, results) {
-            friendList.push(results.username)
-            res.json(friendList)
+          Friendship.findOne({'userId': currentUser.userId}, 'friends', function(err, data){
+            if (err) {
+              console.log(err)
+            } else {
+              if (data.friends.length === 0) {
+                for (var i=0; i< users.length; i++) {
+                  if (users[i].username!==currentUser.username) {
+                    var person = {
+                      username: users[i].username,
+                      friendship: false
+                    }
+                    userList.push(person)
+                    if (users[i] === users[users.length-1]) {
+                      console.log("outputing userlist: " + userList)
+                      res.json(userList)
+                    }
+                  } else if (users[i].username===currentUser.username && users[i] === users[users.length-1]) {
+                    //since this code wouldn't send out res.json if currentuser is the last of the search results, we are doing this extra cycle.
+                    res.json(userList)
+                  }
+                }
+              } else {
+                for (var i=0; i< users.length; i++) {
+                  if (users[i].username!==currentUser.username) {
+                    var person = {
+                      username: users[i].username,
+                      friendship: false
+                    }
+                    for (var j=0; j<data.friends.length; j++) {
+                      if (data.friends[j]==users[i]._id) {
+                        person.friendship = true
+                      }
+                    }
+                    userList.push(person)
+                    if (users[i] === users[users.length-1]) {
+                      console.log(userList)
+                      res.json(userList)
+                    }
+                  } else if (users[i].username===currentUser.username && users[i] === users[users.length-1]) {
+                    res.json(userList)
+                  }
+                }
+              }
+            }
           })
         }
       }
-    }
   })
 })
 
 app.post('/addfriend', function(req,res) {
+  function getFriendId(username) {
+    var dfd = Q.defer();
+    User.findOne({'username': username}, '_id',
+     function(err, data) {
+       if (err) {
+         dfd.reject(err)
+        } else {
+          dfd.resolve(data._id)
+        }
+      });
+    return dfd.promise
+  }
+
+  function addFriend(friendId){
+  var dfd = Q.defer();
+  Friendship.findOne({'userId': currentUser.userId}, 'friends', function(err, data){
+    if (err) {
+      console.log(err)
+      dfd.reject(err)
+    } else {
+      if (data.friends.length===0 || data === null) {
+        dfd.resolve(data)
+      } else if (data.friends.length!==0) {
+        for (var i=0; i<data.friends.length; i++) {
+          if (data.friends[i] === friendId) {
+            //if one of the friends is equal to the selected friend, we return it.
+            res.json(data.friends[i])
+          } else if (data.friends[i] === data.friends[data.friends.length-1] && data.friends[i] !== friendId) {
+            //if none are equal to the selected friend and we are in the last loop.
+            dfd.resolve(data)
+          }
+        }
+      }
+    }
+  })
+  return dfd.promise
+ }
+
+ getFriendId(req.body.friend).then(function(friendId) {
+   addFriend(friendId).then(function() {
+     Friendship.findOneAndUpdate({'userId': currentUser.userId},
+      {$push: {friends: friendId}}, function(err,data){
+        if (err) {
+          console.log(err)
+        } else {
+          //we created a one-way friendship; now we have to close it with another way.
+          Friendship.findOneAndUpdate({'userId': friendId},
+           {$push: {friends: currentUser.userId}}, function(err,data){
+             if (err) {
+               console.log(err)
+             } else {
+               res.send("We have updated successfully!")
+             }
+           })
+        }
+      })
+   })
+ })
+})
+
+app.get('/getfriends', function(req,res) {
   Friendship.findOne({'userId': currentUser.userId}, 'friends', function(err, data){
     if (err) {
       console.log(err)
     } else {
-      if (data) {
-        console.log("This is returing the list of friends before we loop it through: " + data)
-        for (var i=0; i<data.friends.length; i++) {
-          if (data.friends[i] == req.body.friendId) {
-            console.log("We found your friendship")
-            res.json(data.friends[i])
-          } else if (data.friends[i] == data.friends[data.friends.length]) {
-            console.log("We didn't find a match")
-            console.log("And so we are creating an entry.")
-            Friendship.findOne({'userId': currentUser.userId},
-            'friends', function(err, update) {
-              if (err) {
-                console.log(err)
-              } else {
-                console.log(update)
-                res.json(update)
-              }
+      var friendList = []
+      if (data === null) {
+        res.json(friendList)
+      } else {
+        for (var i = 0; i < data.friends.length; i++) {
+          if (data.friends[i] != data.friends[data.friends.length - 1]) {
+            User.findOne({'_id': data.friends[i]}, 'username', function(err, results) {
+              friendList.push(results.username)
+            })
+          } else {
+            User.findOne({'_id': data.friends[i]}, 'username', function(err, results) {
+              friendList.push(results.username)
+              res.json(friendList)
             })
           }
         }
-      } else {
-        var newFriendship = new Friendship()
-        newFriendship.userId = currentUser.userId
-        newFriendship.friends[0] = req.body.friendId
-        newFriendship.save(function(err, data) {
-          if (err) {
-            console.log(err)
-          } else {
-            console.log("We made a new friend")
-            console.log(data)
-          }
-        })
       }
     }
   })

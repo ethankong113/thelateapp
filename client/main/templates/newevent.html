@@ -1,5 +1,5 @@
-
-  <div class="text-center"><h3><span class="label label-primary">Create new event</span></h3></div>
+  <div class="empty-row-sm"></div>
+  <div class="text-center section-banner"><h2>Create New Event</h2></div>
   <form name="eventForm" method="post" action="createevent">
     <div class="empty-row"></div>
     <div class="input-group">
@@ -17,10 +17,9 @@
       <input type="time" name="time" class="form-control" aria-describedby="basic-addon3"  ng-model="eventtime">
       <span class="input-group-addon" id="basic-addon4">Grace Period</span>
       <select class="form-control" name="graceperiod" aria-describedby="basic-addon4" ng-model="eventgraceperiod">
-        <option value="zero" selected>0 min</option>
-        <option value="five">5 min</option>
-        <option value="ten">10 min</option>
-        <option value="fifteen">15 min</option>
+        <option value="00" selected="selected">0 min</option>
+        <option value="05">5 min</option>
+        <option value="10">10 min</option>
       </select>
     </div>
     <div class="empty-row"></div>
@@ -31,15 +30,20 @@
     <div class="empty-row"></div>
     <ul class="list-group">
       <div class="dropdown">
-      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-click="searchFriends()">
-        Select Guests
-        <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-        <li ng-repeat="friend in friends" ng-click="clickEvent($event)" data-friend-id="{{friend}}">&nbsp;&nbsp;{{friend}}</li>
-      </ul>
-    </div>
-      <li class="list-group-item"><span>Guest List: </span><span ng-repeat="guest in guestlist"><span class="label label-info">{{guest.guest}}</span>&nbsp;</span></li>
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-click="searchFriends()">
+          Select Guests
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+          <li ng-repeat="friend in friends" ng-click="clickEvent($event)" data-friend="{{friend}}">&nbsp;&nbsp;{{friend}}</li>
+        </ul>
+      </div>
+      <li class="list-group-item">
+        <span>Guest List: </span>
+        <span ng-repeat="guest in guestlist">
+          <span class="label label-info">{{guest.guest}}</span>&nbsp;
+        </span>
+      </li>
     </ul>
     <div class="empty-row"></div>
     <div class="text-center">

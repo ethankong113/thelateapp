@@ -10,7 +10,7 @@ var UserSchema = mongoose.Schema({
 var EventSchema = mongoose.Schema({
   host: String,
   title: String,
-  date: Date,
+  date: String,
   time: String,
   graceperiod: String,
   location: String,

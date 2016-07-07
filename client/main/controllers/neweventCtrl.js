@@ -32,12 +32,12 @@ angular.module('mainApp')
     var guestlist = []
     $scope.clickEvent = function ($event) {
       for (var i=0; i < guestlist.length; i++){
-        if (guestlist[i].guest == $event.currentTarget.getAttribute("data-friend-id")) {
+        if (guestlist[i].guest == $event.currentTarget.getAttribute("data-friend")) {
           guestlist.splice(i,1)
         }
       }
       var newGuest = {
-        guest:$event.currentTarget.getAttribute("data-friend-id"),
+        guest:$event.currentTarget.getAttribute("data-friend"),
         status: 'Coming'
       }
       guestlist.push(newGuest)
@@ -46,7 +46,14 @@ angular.module('mainApp')
 
     var statuslist = []
       $scope.submitForm = function(form) {
-        console.log(guestlist)
+        var time =  turnToMinute(form.time.$viewValue)
+
+        console.log("Date: " + typeof(form.date.$viewValue))
+        console.log(form.date.$viewValue)
+        console.log(form.graceperiod.$viewValue)
+
+        console.log("GracePeriod: " + typeof(form.graceperiod.$viewValue))
+        /*
         $http.post('/createevent', {
             title: form.title.$viewValue,
             date: form.date.$viewValue,
@@ -56,8 +63,33 @@ angular.module('mainApp')
             guests: guestlist
         }).then(function(results){
           console.log(results)
-        })
+        })*/
       };
 
+    function turnToMinute(time) {
+      var minute = parseInt(time.slice(3,5))
+      var hour = parseInt(time.slice(0,2))
+      var eventTime = hour*60 + minute
+      return eventTime;
+    }
+
+    function turnToTime(time) {
+      var min = time%60
+      var hr = Math.floor(time/60)
+      var minute
+      var hour
+      if (min < 10) {
+        minute = "0" + min.toString()
+      } else if (min>=10) {
+        minute = min.toString()
+      }
+      if (hr < 10) {
+        hour = "0" + hr.toString()
+      } else if (hr >= 10) {
+        hour = hr.toString()
+      }
+      var eventTime = hour + ":" + minute
+      return eventTime;
+    }
 
   }])
